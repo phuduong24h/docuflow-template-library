@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" width="100%" height="100%">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <rect width="400" height="260" rx="12" fill="url(#grad)" />
+  <g transform="translate(30, 25)">
+    <!-- Document Card Mockup -->
+    <rect x="0" y="0" width="340" height="210" rx="8" fill="#ffffff" filter="url(#shadow)"/>
+    <!-- Header band -->
+    <rect x="0" y="0" width="340" height="36" rx="8" fill="#059669"/>
+    <rect x="0" y="24" width="340" height="12" fill="#059669"/>
+    
+    <!-- Type Icon -->
+    <g transform="translate(20, 52) scale(1.1)">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill="none" stroke="#059669" stroke-width="2"/><polyline points="14 2 14 8 20 8" fill="none" stroke="#059669" stroke-width="2"/><line x1="16" y1="13" x2="8" y2="13" stroke="#94a3b8" stroke-width="2"/><line x1="16" y1="17" x2="8" y2="17" stroke="#94a3b8" stroke-width="2"/><polyline points="10 9 9 9 8 9" stroke="#94a3b8" stroke-width="2"/>
+    </g>
+
+    <!-- Badge -->
+    <rect x="220" y="52" width="100" height="22" rx="11" fill="#f1f5f9"/>
+    <text x="270" y="67" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">OPERATIONS</text>
+
+    <!-- Title -->
+    <text x="20" y="112" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="bold" fill="#0f172a">Meeting Minutes</text>
+
+    <!-- Content mock lines -->
+    <rect x="20" y="130" width="280" height="6" rx="3" fill="#e2e8f0"/>
+    <rect x="20" y="144" width="240" height="6" rx="3" fill="#e2e8f0"/>
+    <rect x="20" y="158" width="200" height="6" rx="3" fill="#e2e8f0"/>
+
+    <!-- Footer pill -->
+    <rect x="20" y="180" width="80" height="16" rx="4" fill="#059669" opacity="0.15"/>
+    <text x="60" y="192" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="bold" fill="#059669" text-anchor="middle">DOCX TEMPLATE</text>
+  </g>
+</svg>

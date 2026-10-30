@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" width="100%" height="100%">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <rect width="400" height="260" rx="12" fill="url(#grad)" />
+  <g transform="translate(30, 25)">
+    <!-- Document Card Mockup -->
+    <rect x="0" y="0" width="340" height="210" rx="8" fill="#ffffff" filter="url(#shadow)"/>
+    <!-- Header band -->
+    <rect x="0" y="0" width="340" height="36" rx="8" fill="#6366f1"/>
+    <rect x="0" y="24" width="340" height="12" fill="#6366f1"/>
+    
+    <!-- Type Icon -->
+    <g transform="translate(20, 52) scale(1.1)">
+      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" fill="none" stroke="#6366f1" stroke-width="2"/><line x1="8" y1="21" x2="16" y2="21" stroke="#6366f1" stroke-width="2"/><line x1="12" y1="17" x2="12" y2="21" stroke="#6366f1" stroke-width="2"/><circle cx="9" cy="10" r="2" fill="#6366f1" opacity="0.6"/><path d="M15 13v-3l-3 3" stroke="#6366f1" stroke-width="1.5"/>
+    </g>
+
+    <!-- Badge -->
+    <rect x="220" y="52" width="100" height="22" rx="11" fill="#f1f5f9"/>
+    <text x="270" y="67" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">CORPORATE</text>
+
+    <!-- Title -->
+    <text x="20" y="112" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="bold" fill="#0f172a">Company Profile</text>
+
+    <!-- Content mock lines -->
+    <rect x="20" y="130" width="280" height="6" rx="3" fill="#e2e8f0"/>
+    <rect x="20" y="144" width="240" height="6" rx="3" fill="#e2e8f0"/>
+    <rect x="20" y="158" width="200" height="6" rx="3" fill="#e2e8f0"/>
+
+    <!-- Footer pill -->
+    <rect x="20" y="180" width="80" height="16" rx="4" fill="#6366f1" opacity="0.15"/>
+    <text x="60" y="192" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="bold" fill="#6366f1" text-anchor="middle">PPTX SLIDES</text>
+  </g>
+</svg>

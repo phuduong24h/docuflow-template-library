@@ -1,0 +1,57 @@
+// Prisma schema for Template Library Platform
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TemplateType {
+  DOCUMENT
+  PRESENTATION
+}
+
+model Template {
+  id           String       @id @default(uuid())
+  name         String
+  slug         String       @unique
+  type         TemplateType
+  category     String
+  description  String
+  thumbnailUrl String
+  storagePath  String       // Relative to STORAGE_ROOT, e.g. templates/documents/business_proposal.docx
+  previewData  Json         // Rich preview payload (HTML or outline for DOCX, slide array for PPTX)
+  mimeType     String
+  fileSize     Int
+  version      Int          @default(1)
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  documents    Document[]
+
+  @@index([type, category])
+  @@index([name])
+  @@index([slug])
+  @@index([isActive])
+}
+
+model Document {
+  id           String       @id @default(uuid())
+  title        String
+  templateId   String?      // Nullable to keep document intact if template is removed
+  template     Template?    @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  type         TemplateType
+  storagePath  String       // Relative to STORAGE_ROOT, e.g. generated/documents/xyz.docx
+  mimeType     String
+  fileSize     Int
+  metadata     Json?        // Dynamic fields, title, recipient, custom variables
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([type])
+  @@index([templateId])
+  @@index([createdAt])
+}
