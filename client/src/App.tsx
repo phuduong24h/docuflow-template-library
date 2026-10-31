@@ -14,9 +14,11 @@ import { Toast, ToastMessage } from './components/common/Toast.tsx';
 import { useTemplates } from './hooks/useTemplates.ts';
 import { useDocuments } from './hooks/useDocuments.ts';
 import { Template, TemplateType } from './types/template.types.ts';
+import { useLanguage } from './context/LanguageContext.tsx';
 import { ChevronLeft, ChevronRight, FileText, Presentation } from 'lucide-react';
 
 export const App: React.FC = () => {
+  const { t } = useLanguage();
   const [activeView, setActiveView] = useState<ActiveView>('DOCUMENTS');
   const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
   const [createTargetTemplate, setCreateTargetTemplate] = useState<Template | null>(null);
@@ -56,7 +58,7 @@ export const App: React.FC = () => {
   };
 
   const removeToast = (id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
+    setToasts((prev) => prev.filter((to) => to.id !== id));
   };
 
   const handleSelectView = (view: ActiveView) => {
@@ -82,14 +84,14 @@ export const App: React.FC = () => {
   const handleCreateSuccess = (_documentId: string, title: string, _type: TemplateType) => {
     addToast(
       'success',
-      'Document created successfully!',
-      `"${title}" was instantiated from template and is ready.`
+      t.toasts.createSuccessTitle,
+      t.toasts.createSuccessDesc.replace('{title}', title)
     );
     refreshDocs();
   };
 
   const handleCreateError = (errorMsg: string) => {
-    addToast('error', 'Failed to generate document', errorMsg);
+    addToast('error', t.toasts.createErrorTitle, errorMsg);
   };
 
   const totalMyFiles = documents.length + presentations.length;
@@ -116,10 +118,10 @@ export const App: React.FC = () => {
             <div>
               <div className="mb-6">
                 <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-                  My Generated Documents
+                  {t.home.myFilesHeaderTitle}
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                  Isolated physical copies created from templates. Download DOCX or PPTX at any time.
+                  {t.home.myFilesHeaderDesc}
                 </p>
               </div>
 
@@ -130,17 +132,17 @@ export const App: React.FC = () => {
                 onDownload={async (id, type, title) => {
                   try {
                     await downloadFile(id, type, title);
-                    addToast('success', 'Download started', `${title}.${type === 'DOCUMENT' ? 'docx' : 'pptx'}`);
+                    addToast('success', t.toasts.downloadStartedTitle, `${title}.${type === 'DOCUMENT' ? 'docx' : 'pptx'}`);
                   } catch (err) {
-                    addToast('error', 'Download failed', (err as Error).message);
+                    addToast('error', t.toasts.downloadFailedTitle, (err as Error).message);
                   }
                 }}
                 onDelete={async (id, type) => {
                   try {
                     await deleteFile(id, type);
-                    addToast('info', 'Document removed', 'Physical file and database entry deleted.');
+                    addToast('info', t.toasts.deletedTitle, t.toasts.deletedDesc);
                   } catch (err) {
-                    addToast('error', 'Delete failed', (err as Error).message);
+                    addToast('error', t.toasts.deleteFailedTitle, (err as Error).message);
                   }
                 }}
                 onNavigateToTemplates={() => handleSelectView('DOCUMENTS')}
@@ -159,14 +161,14 @@ export const App: React.FC = () => {
                     )}
                     <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
                       {activeView === 'DOCUMENTS'
-                        ? 'Document Template Library'
-                        : 'Presentation Template Library'}
+                        ? t.home.docxHeaderTitle
+                        : t.home.pptxHeaderTitle}
                     </h1>
                   </div>
                   <p className="text-xs sm:text-sm text-slate-500 mt-1">
                     {activeView === 'DOCUMENTS'
-                      ? 'Select from validated OpenXML DOCX business proposals, contracts, and reports.'
-                      : 'Explore multi-slide PowerPoint decks, company profiles, and technical review slides.'}
+                      ? t.home.docxHeaderDesc
+                      : t.home.pptxHeaderDesc}
                   </p>
                 </div>
 
@@ -174,7 +176,11 @@ export const App: React.FC = () => {
                 <SearchBar
                   value={search}
                   onChange={setSearch}
-                  placeholder={`Search ${activeView === 'DOCUMENTS' ? 'DOCX' : 'PPTX'} templates...`}
+                  placeholder={
+                    activeView === 'DOCUMENTS'
+                      ? t.home.searchDocxPlaceholder
+                      : t.home.searchPptxPlaceholder
+                  }
                 />
               </div>
 
@@ -192,8 +198,9 @@ export const App: React.FC = () => {
                 <ErrorState message={error} onRetry={retry} />
               ) : !loading && templates.length === 0 ? (
                 <EmptyState
-                  title="No templates match your search"
-                  description="Try resetting your keyword or selecting 'All Categories'."
+                  title={t.home.noTemplatesTitle}
+                  description={t.home.noTemplatesDesc}
+                  actionLabel={t.home.clearFilters}
                   onReset={() => {
                     setSearch('');
                     setCategory('');
@@ -212,9 +219,10 @@ export const App: React.FC = () => {
               {pagination && pagination.totalPages > 1 && (
                 <div className="mt-8 flex items-center justify-between border-t border-slate-200 pt-4">
                   <span className="text-xs text-slate-500">
-                    Showing page <span className="font-semibold text-slate-800">{pagination.page}</span> of{' '}
-                    <span className="font-semibold text-slate-800">{pagination.totalPages}</span> (
-                    {pagination.total} templates total)
+                    {t.common.showingPage
+                      .replace('{page}', String(pagination.page))
+                      .replace('{totalPages}', String(pagination.totalPages))
+                      .replace('{total}', String(pagination.total))}
                   </span>
                   <div className="flex items-center space-x-2">
                     <button
@@ -223,14 +231,14 @@ export const App: React.FC = () => {
                       className="inline-flex items-center space-x-1 px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                     >
                       <ChevronLeft className="w-4 h-4" />
-                      <span>Previous</span>
+                      <span>{t.common.previous}</span>
                     </button>
                     <button
                       onClick={() => setPage(page + 1)}
                       disabled={!pagination.hasNextPage}
                       className="inline-flex items-center space-x-1 px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                     >
-                      <span>Next</span>
+                      <span>{t.common.next}</span>
                       <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -275,4 +283,5 @@ export const App: React.FC = () => {
     </div>
   );
 };
+
 export default App;

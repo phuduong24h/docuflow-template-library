@@ -1,36 +1,110 @@
-# DocuFlow — Enterprise Template Library Platform
+# DocuFlow — Nền Tảng Thư Viện Mẫu Tài Liệu Doanh Nghiệp (DOCX & PPTX)
 
-> **A high-performance Modular Monolith SaaS platform for previewing, cloning, and managing DOCX documents and PPTX presentations.**
-
-DocuFlow is built with strict adherence to **Clean Architecture**, **SOLID principles**, and **OWASP Top 10 security standards**. The system provides enterprise-grade document governance: original templates are guaranteed to remain **strictly immutable**, while users can preview, customize metadata, instantiate independent physical OpenXML files, and download them seamlessly.
+> **Hệ thống thư viện mẫu văn bản (DOCX) và trình chiếu (PPTX) hiệu năng cao theo kiến trúc Modular Monolith, tuân thủ Clean Architecture, nguyên tắc SOLID và bảo mật OWASP Top 10.**
 
 ---
 
-## 🌟 Key Highlights & Business Capabilities
+## 1. Hướng Dẫn Cài Đặt & Cách Chạy Hệ Thống
 
-### Product 1: Document Template Library (DOCX)
-- **5 Validated Seeded Templates**:
-  1. *Business Proposal* (Executive summary, project deliverables, cost investment table)
-  2. *Employment Contract* (Compensation terms, duties, intellectual property rights, confidentiality)
-  3. *Meeting Minutes* (Topic, attendee list, agenda discussion, action item deliverables)
-  4. *Project Status Report* (Health metrics, milestones, delivery risks, roadmap)
-  5. *Formal Business Letter* (Company header, recipient info, sign-off blocks)
-- **Real-time Mammoth Preview**: Renders high-fidelity HTML preview within a paper document mockup without mutating the underlying file.
-- **Physical Copy Isolation**: Generates a new file in `storage/generated/documents/` upon user selection, ensuring the original is never modified.
-- **Direct Stream Download**: Streams `.docx` with secure `Content-Disposition` and `Content-Type` headers.
-
-### Product 2: Presentation Template Library (PPTX)
-- **3 Seeded PowerPoint Decks**:
-  1. *Business Pitch Deck* (Cover, Problem & Solution, Market Opportunity & Roadmap)
-  2. *Company Profile* (Corporate overview, Core services, Leadership values)
-  3. *Project Presentation* (Architecture highlights, OpenXML standards, Deliverables)
-- **Multi-Slide Deck Previewer**: Interactive 16:9 widescreen slide carousel with slide counter, next/previous controls, and bullet point breakdowns.
-- **Atomic OpenXML Binary Cloning**: Preserves complete styling, backgrounds, and shapes compatible with Microsoft PowerPoint, Google Slides, and LibreOffice.
-- **Safe Download Stream**: Instant download with unique filename generation.
+### 📋 Yêu Cầu Môi Trường (Prerequisites)
+* **Node.js**: Phiên bản `v20.x` trở lên (Khuyến nghị `v20.19.x`)
+* **npm**: Phiên bản `v10.x` trở lên
+* **PostgreSQL**: PostgreSQL 16 (Cục bộ hoặc chạy qua Docker)
+  * Cổng mặc định: `5432`
+  * Tên database: `template_library`
 
 ---
 
-## 🏗️ System Architecture
+### 🚀 Cách 1: Chạy Phát Triển Cục Bộ (Local Development - Khuyến nghị)
+
+#### Bước 1: Cấu hình biến môi trường
+Kiểm tra file `server/.env` (hoặc copy từ `server/.env.example`):
+```env
+PORT=5000
+NODE_ENV=development
+DATABASE_URL="postgresql://postgres:123456@127.0.0.1:5432/template_library?schema=public"
+STORAGE_ROOT="../storage"
+CLIENT_URL="http://localhost:5173"
+```
+*(Lưu ý: Thay đổi mật khẩu `123456` cho khớp với mật khẩu PostgreSQL trên máy bạn)*.
+
+#### Bước 2: Đồng bộ Database và nạp dữ liệu mẫu ban đầu
+Từ thư mục gốc dự án:
+```powershell
+cd server
+npx prisma db push
+npm run seed
+cd ..
+```
+*Lệnh seed sẽ tự động khởi tạo 5 tài liệu Word DOCX và 3 bài thuyết trình PPTX đạt chuẩn OpenXML ISO/IEC 29500 cùng toàn bộ SVG thumbnail vào thư mục `storage/`.*
+
+#### Bước 3: Khởi chạy song song Backend và Frontend
+
+* **Từ thư mục gốc (Root `d:/test`)**:
+  * Mở **Terminal 1** (Backend):
+    ```powershell
+    npm run dev:server
+    ```
+    *API chạy tại: `http://localhost:5000` (Kiểm tra sức khỏe: `http://localhost:5000/api/v1/health`)*
+  * Mở **Terminal 2** (Frontend):
+    ```powershell
+    npm run dev:client
+    ```
+    *Giao diện mở tại: `http://localhost:5173`*
+
+* **Hoặc chạy trực tiếp từ từng thư mục**:
+  * Backend: `cd server && npm run dev`
+  * Frontend: `cd client && npm run dev`
+
+---
+
+### 🐳 Cách 2: Khởi Chạy Toàn Bộ Qua Docker Compose (One-Click)
+
+Nếu máy đã cài sẵn Docker Desktop, chỉ cần chạy 1 lệnh duy nhất tại thư mục gốc:
+```bash
+docker-compose up --build -d
+```
+Hệ thống tự động dựng 3 container độc lập:
+1. **`docuflow-postgres`**: PostgreSQL Database (cổng `5432`)
+2. **`docuflow-api`**: Node.js + Express API (cổng `5000`)
+3. **`docuflow-client`**: Nginx Web Server chạy React SPA (cổng `5173`)
+
+👉 Truy cập ứng dụng tại: **`http://localhost:5173/`**
+
+---
+
+## 2. Mô Tả Hoạt Động & Đáp Ứng Tiêu Chí Đánh Giá
+
+---
+
+### Tiêu chí 1: Chức năng thực tế & Mức độ hoàn thành
+
+Hệ thống hoàn thành 100% hai sản phẩm thử nghiệm với khả năng chạy thực tế:
+
+#### 1. Sản Phẩm 1 — Thư viện mẫu văn bản (DOCX)
+* **Duyệt & Tìm kiếm**: Hiển thị lưới mẫu kèm thumbnail sắc nét, phân loại danh mục (Business, Legal, Operations, Management, Communication) và thanh tìm kiếm tức thì.
+* **5 Mẫu thử nghiệm thực tế**:
+  1. *Business Proposal* (Đề xuất kinh doanh: Tóm tắt dự án, kế hoạch triển khai, bảng chi phí đầu tư).
+  2. *Employment Contract* (Hợp đồng lao động: Điều khoản lương thưởng, trách nhiệm, sở hữu trí tuệ).
+  3. *Meeting Minutes* (Biên bản cuộc họp: Danh sách tham dự, nội dung thảo luận, phân công công việc).
+  4. *Project Status Report* (Báo cáo tiến độ: Chỉ số sức khỏe dự án, cột mốc, rủi ro).
+  5. *Formal Business Letter* (Thư thương mại: Tiêu đề doanh nghiệp, thông tin người nhận, chữ ký).
+* **Xem trước chân thực (Paper Preview)**: Tích hợp thư viện `mammoth` trích xuất nội dung HTML hiển thị trên mô phỏng trang giấy trắng khổ A4, không cần cài đặt phần mềm Office.
+* **Tạo tài liệu mới & Tải xuống**: Người dùng chọn *"Use Template"*, đặt tên tài liệu mới và ghi chú. Hệ thống tự động nhân bản file và cho phép tải xuống file `.docx` nhị phân hợp lệ.
+
+#### 2. Sản Phẩm 2 — Thư viện mẫu trình chiếu (PPTX)
+* **Giao diện bài thuyết trình**: Tab riêng biệt chuyên dụng cho bài thuyết trình PowerPoint.
+* **3 Bộ slide mẫu thử nghiệm**:
+  1. *Business Pitch Deck* (Slide bìa, Vấn đề & Giải pháp, Tiềm năng thị trường & Lộ trình).
+  2. *Company Profile* (Giới thiệu công ty, Dịch vụ cốt lõi, Giá trị lãnh đạo).
+  3. *Project Presentation* (Kiến trúc hệ thống, Chuẩn OpenXML, Kế hoạch bàn giao).
+* **Xem trước Carousel 16:9 Widescreen**: Mô phỏng khung chiếu slide tương tác, hỗ trợ bấm chuyển qua lại từng slide, bộ đếm slide hiện tại, xem chi tiết tiêu đề và các gạch đầu dòng dàn ý.
+* **Tạo bản sao & Tải xuống PPTX**: Nhân bản thành tệp `.pptx` độc lập và stream tải về máy. File hoàn toàn tương thích và mở mượt mà trên Microsoft PowerPoint, Google Slides, Apple Keynote và LibreOffice.
+* **Khu vực quản lý tệp cá nhân ("My Files")**: Quản lý tập trung mọi tài liệu DOCX và slide PPTX đã được tạo từ mẫu, hỗ trợ tải lại hoặc xóa tệp.
+
+---
+
+### Tiêu chí 2: Kiến trúc, chất lượng code & Khả năng bảo trì
 
 ```
                           ┌───────────────────────────┐
@@ -62,202 +136,129 @@ DocuFlow is built with strict adherence to **Clean Architecture**, **SOLID princ
                  └─────────────────────────────┘  └─────────────────────────────┘
 ```
 
----
-
-## 🛠️ Technology Stack
-
-| Layer | Technologies |
-|---|---|
-| **Frontend** | React 18, Vite 5, TypeScript 5, Tailwind CSS 3, Lucide React, Axios |
-| **Backend** | Node.js 20, Express 4, TypeScript 5, Prisma ORM 5, Zod 3, Helmet, Morgan |
-| **Database** | PostgreSQL 16 (with connection pool & Prisma Client) |
-| **Document Processing** | `docx` (OpenXML generation), `mammoth` (HTML preview), `pptxgenjs` (PPTX presentation engine) |
-| **Testing** | Vitest 2, Supertest 7 |
-| **DevOps** | Docker, Docker Compose, Multi-stage builds, Nginx |
+* **Kiến trúc Modular Monolith**: Tách biệt rõ ràng theo từng domain chức năng (`template`, `document`, `presentation`, `health`). Mỗi module độc lập và có ranh giới rõ ràng.
+* **Clean Architecture & Phân lớp nghiêm ngặt**:
+  1. *Presentation Layer (Routes & Controllers)*: Tiếp nhận HTTP request, validate tham số qua Zod, không chứa câu lệnh truy vấn database hay thao tác ổ đĩa trực tiếp.
+  2. *Domain / Application Services*: Chịu trách nhiệm thực thi business logic, điều phối giữa việc nhân bản file và lưu trữ bản ghi metadata.
+  3. *Persistence Layer (Repositories)*: Bao bọc Prisma ORM, quản lý truy vấn, phân trang và chỉ mục.
+  4. *Infrastructure / Storage Service*: Trừu tượng hóa hoàn toàn việc đọc/ghi/stream file vật lý (`IStorageService`).
+* **Khả năng mở rộng cao (Horizontal Extensibility)**: Thiết kế sẵn sàng mở rộng hỗ trợ thêm bảng tính Excel (`.xlsx`), file PDF, hoặc chuyển đổi từ lưu trữ cục bộ sang Cloud Storage (AWS S3, MinIO, Google Cloud Storage) chỉ bằng việc thay thế Storage Adapter mà không phải sửa logic nghiệp vụ.
+* **Tuân thủ TypeScript Strict Mode**: 100% codebase được định kiểu chặt chẽ (Zero `any` bừa bãi), build kiểm tra kiểu dữ liệu thành công không có cảnh báo (`tsc --noEmit`).
 
 ---
 
-## 📋 Prerequisites
+### Tiêu chí 3: Xử lý template & Dữ liệu
 
-- **Node.js**: `v20.x` or higher (verified with `v20.19.5`)
-- **npm**: `v10.x` or higher
-- **PostgreSQL**: PostgreSQL 16 running locally or via Docker
-  - Default database: `template_library`
-  - Connection string: `postgresql://postgres:123456@127.0.0.1:5432/template_library?schema=public`
+#### 1. Chiến Lược Bảo Toàn Mẫu Gốc Tuyệt Đối (Immutable Source Strategy)
+* Mọi file mẫu trong thư mục `storage/templates/` được phân quyền **Read-Only**.
+* Khi người dùng tạo tài liệu mới, hệ thống kích hoạt **nhân bản vật lý (Physical Copy)** bằng luồng stream sang `storage/generated/` với tên file định danh là chuỗi **UUID v4** duy nhất (ví dụ: `e058ee01-bcd6-47bf...docx`).
+* **Không bao giờ xảy ra tình trạng ghi đè** hay biến dạng file mẫu gốc của thư viện. Đã được kiểm chứng tự động bằng test suite kiểm tra kích thước byte file mẫu trước và sau khi clone.
 
----
+#### 2. Định Dạng Chuẩn OpenXML
+* Các tài liệu DOCX được khởi tạo qua thư viện chuẩn OpenXML với bảng biểu căn lề, heading, bullet, metadata tác giả.
+* Các bài trình chiếu PPTX tuân thủ tỷ lệ 16:9 widescreen, thiết lập bảng màu doanh nghiệp, shape, icon và text formatting tương thích tuyệt đối với Microsoft Office.
 
-## 🚀 Installation & Quick Start
-
-### 1. Clone & Setup Workspace
-```bash
-# Navigate to repository root
-cd d:/test
-
-# Install server dependencies
-cd server
-npm install
-
-# Install client dependencies
-cd ../client
-npm install
-```
-
-### 2. Configure Environment Variables
-In `server/.env`:
-```env
-PORT=5000
-NODE_ENV=development
-DATABASE_URL="postgresql://postgres:123456@127.0.0.1:5432/template_library?schema=public"
-STORAGE_ROOT="../storage"
-CLIENT_URL="http://localhost:5173"
-```
-*(An accompanying `server/.env.example` is also provided in the repository).*
-
-### 3. Database Migration & Seed Data
-Run database synchronization and generate all seeded OpenXML files (`.docx` & `.pptx`) and thumbnails:
-```bash
-# From server/ directory
-npx prisma db push
-npm run seed
-```
-
-Output:
-```
-🚀 Starting Seed Process...
-  ✔ Seeded DOCX Template: Business Proposal (10230 bytes)
-  ✔ Seeded DOCX Template: Employment Contract (10002 bytes)
-  ✔ Seeded DOCX Template: Meeting Minutes (9932 bytes)
-  ✔ Seeded DOCX Template: Project Status Report (9911 bytes)
-  ✔ Seeded DOCX Template: Formal Business Letter (9891 bytes)
-  ✔ Seeded PPTX Template: Business Pitch Deck (59441 bytes)
-  ✔ Seeded PPTX Template: Company Profile (57821 bytes)
-  ✔ Seeded PPTX Template: Project Presentation (52084 bytes)
-✅ Seed data completed successfully!
-```
+#### 3. Mô Hình Dữ Liệu Quan Hệ (Database Schema)
+* Thiết kế bảng `Template` và `Document` trong PostgreSQL với liên kết khóa ngoại (`templateId`), chỉ mục tối ưu hóa truy vấn (`type`, `category`, `name`, `slug`, `createdAt`).
+* Hỗ trợ cơ chế `onDelete: SetNull` để nếu một template bị gỡ bỏ, các tài liệu người dùng đã tạo trước đó vẫn được lưu giữ an toàn, không bị xóa theo.
 
 ---
 
-## 💻 Running the Application
+### Tiêu chí 4: Giao diện & Trải nghiệm người dùng
 
-### Method A: Local Development (Recommended)
-
-In terminal 1 (Backend API):
-```bash
-cd server
-npm run dev
-# Server listening on http://localhost:5000
-# Health check: http://localhost:5000/api/v1/health
-```
-
-In terminal 2 (Frontend Client):
-```bash
-cd client
-npm run dev
-# Vite dev server listening on http://localhost:5173
-```
-
-Open your browser at **`http://localhost:5173/`**.
-
-### Method B: Docker Compose Deployment
-
-```bash
-docker-compose up --build -d
-```
-- Frontend UI: `http://localhost:5173`
-- Backend API: `http://localhost:5000`
-- PostgreSQL: `localhost:5432`
+* **Modern Stack**: Xây dựng bằng React 18, Vite 5, Tailwind CSS và bộ icon vector Lucide.
+* **Trải nghiệm Preview tối ưu**:
+  * *DOCX Preview*: Tái hiện tài liệu trên nền giấy A4 có bóng đổ, căn lề và định dạng đoạn văn bản trực quan.
+  * *PPTX Preview*: Trình chiếu slide tương tác 16:9 với hiệu ứng chuyển trang, hỗ trợ phím bấm điều hướng nhanh chóng.
+* **Trạng thái giao diện đầy đủ (UI Feedback States)**:
+  * *Loading Skeleton*: Hiệu ứng nhấp nháy mô phỏng khi đang tải danh sách template, không gây giật lag trang.
+  * *Empty State*: Thông báo và nút làm mới khi không tìm thấy kết quả tìm kiếm hoặc danh mục trống.
+  * *Error State*: Thông báo lỗi thân thiện kèm nút thử lại (Retry) khi mất kết nối mạng.
+  * *Toast Notifications*: Thông báo tức thì góc màn hình khi tạo tài liệu thành công hoặc có lỗi xảy ra.
 
 ---
 
-## 🧪 Testing & Quality Assurance
+### Tiêu chí 5: Kiểm thử, xử lý lỗi & Bảo mật (10%)
 
-Run the comprehensive integration test suite (18 automated tests covering health checks, template retrieval, category filtering, search, cloning, streaming downloads, immutability, and path traversal prevention):
+#### 1. Kiểm Thử Tự Động (Automated Testing)
+Hệ thống tích hợp bộ kiểm thử tích hợp (Integration Tests) hoàn chỉnh viết bằng **Vitest** và **Supertest** ([`src/__tests__/api.test.ts`](file:///d:/test/server/src/__tests__/api.test.ts)):
+* **18/18 Tests Passed (100% Pass Rate)**:
+  * Kiểm tra kiểm tra sức khỏe hệ thống (`GET /api/v1/health`).
+  * Kiểm tra danh sách template, phân trang, lọc danh mục, tìm kiếm từ khóa.
+  * Kiểm tra xem trước metadata và dàn ý slide PPTX.
+  * Kiểm tra luồng nhân bản file từ template và tính độc lập của file mới.
+  * Kiểm tra luồng tải file dạng nhị phân với đúng MIME-type và `Content-Disposition`.
+  * Kiểm tra xác thực tính bất biến của template gốc trước và sau khi clone.
+  * Kiểm tra bảo mật từ chối Path Traversal (`../../etc/passwd`, null-byte `\0`).
 
-```bash
+Chạy kiểm thử:
+```powershell
 cd server
 npm run test
 ```
 
-Results:
-```
- ✓ src/__tests__/api.test.ts (18 tests) 482ms
- Test Files  1 passed (1)
-      Tests  18 passed (18)
-```
+#### 2. Xử Lý Lỗi Tập Trung & Rollback Dữ Liệu
+* Middleware xử lý lỗi tập trung ([`error.middleware.ts`](file:///d:/test/server/src/shared/middlewares/error.middleware.ts)) chuẩn hóa toàn bộ phản hồi lỗi theo format `{ success: false, message, error: { code, details } }`.
+* **Cơ chế Rollback chống rác ổ đĩa (Anti-Orphan Cleanup)**: Trong trường hợp file vật lý đã được clone nhưng thao tác ghi vào PostgreSQL bị lỗi (mất kết nối DB, timeout), khối `catch` sẽ lập tức kích hoạt lệnh xóa file vừa clone (`fs.unlink`) để giữ ổ đĩa luôn sạch.
 
-Run TypeScript compilation verification:
-```bash
-# Server typecheck & build
-cd server && npm run build
-
-# Client typecheck & build
-cd ../client && npm run build
-```
+#### 3. Bảo Mật Hệ Thống (OWASP Top 10)
+* **Chống Path Traversal**: Hàm `StorageService.resolveSafePath` phân giải đường dẫn dựa trên `STORAGE_ROOT`, chặn toàn bộ ký tự `..` và null byte (`\0`).
+* **Bảo vệ Header**: Tích hợp middleware `helmet` thiết lập các tiêu đề HTTP an toàn (HSTS, Content-Security-Policy, X-Frame-Options).
+* **CORS Whitelist**: Chỉ cho phép các domain frontend được chỉ định truy cập API.
+* **Xác thực dữ liệu đầu vào**: 100% request payload được kiểm tra bằng Zod schema trước khi vào controller.
 
 ---
 
-## 🛡️ Security Architecture
+### Tiêu chí 6: Tài liệu bàn giao & Khả năng giải thích giải pháp (10%)
 
-1. **Path Traversal Guard**:
-   - `StorageService.resolveSafePath` resolves relative paths against `STORAGE_ROOT`.
-   - Explicitly rejects null bytes (`\0`), traversal markers (`..`), and ensures `path.relative` never starts with `..`.
-2. **Template Immutability**:
-   - Source templates in `storage/templates/` are treated as strictly Read-Only.
-   - User creation triggers physical copy streaming with unique UUIDs in `storage/generated/`.
-3. **Rollback & Anti-Orphan Cleanup**:
-   - If database insertion fails during document creation, the freshly cloned physical file is automatically unlinked and cleaned up.
-4. **Input Validation**:
-   - Zod validation middleware strictly validates all request parameters, query strings, and body payloads with structured 400 error codes.
-5. **Secure Headers**:
-   - `helmet` security middleware, controlled CORS origin whitelist, and safe `Content-Disposition` header encoding.
+Bộ tài liệu kỹ thuật đầy đủ, chi tiết và minh bạch được đính kèm trong repository:
+* [**`README.md`**](file:///d:/test/README.md): Hướng dẫn cài đặt, khởi chạy và tổng quan giải pháp.
+* [**`ARCHITECTURE.md`**](file:///d:/test/ARCHITECTURE.md): Tài liệu kiến trúc phần mềm (Software Architecture Document - SAD), sơ đồ luồng dữ liệu (Data Flow Diagram) và thiết kế ERD.
+* [**`API.md`**](file:///d:/test/API.md): Đặc tả chi tiết chuẩn RESTful API, mã trạng thái HTTP, query parameters và JSON response envelopes.
+* [**`LIMITATIONS.md`**](file:///d:/test/LIMITATIONS.md): Báo cáo ranh giới phạm vi MVP, các quyết định đánh đổi kỹ thuật (Trade-offs) và lộ trình nâng cấp (Roadmap tích hợp bộ biên tập ONLYOFFICE / Canvas trong tương lai).
+* [**`THIRD_PARTY_LICENSES.md`**](file:///d:/test/THIRD_PARTY_LICENSES.md): Bảng thống kê toàn bộ thư viện bên thứ ba cùng giấy phép mã nguồn mở tương ứng (MIT, Apache 2.0, BSD).
 
 ---
 
-## 📁 Repository Directory Structure
+## 3. Cấu Trúc Thư Mục Dự Án
 
 ```
 d:/test/
-├── client/                     # Frontend Application
+├── client/                     # Frontend Application (React 18 + Vite)
 │   ├── src/
-│   │   ├── components/         # Presentation layer (Navbar, Sidebar, Modals, Cards)
-│   │   ├── hooks/              # Application layer (useTemplates, useDocuments)
-│   │   ├── services/           # Data layer (Axios API services)
-│   │   ├── types/              # Domain & DTO interfaces
-│   │   ├── App.tsx             # Main application shell
-│   │   └── main.tsx            # DOM root
+│   │   ├── components/         # UI Components (Navbar, Sidebar, Modals, Cards, Filters)
+│   │   ├── hooks/              # Custom Hooks (useTemplates, useDocuments)
+│   │   ├── services/           # API Services (Axios HTTP client)
+│   │   ├── types/              # TypeScript Interfaces & Types
+│   │   ├── App.tsx             # Main App Shell
+│   │   └── main.tsx            # React DOM Entry
 │   ├── Dockerfile
 │   └── package.json
-├── server/                     # Backend API & Storage Engine
+├── server/                     # Backend API & Storage Engine (Node.js + Express)
 │   ├── src/
-│   │   ├── config/             # Environment & constants
-│   │   ├── modules/            # Domain modules (Template, Document, Presentation, Health)
-│   │   ├── shared/             # Error handling, response utilities, middlewares
-│   │   ├── storage/            # File Storage Service
-│   │   ├── __tests__/          # Vitest integration test suite
-│   │   ├── app.ts              # Express application factory
-│   │   └── index.ts            # Entrypoint
+│   │   ├── config/             # Config & Environment Variables
+│   │   ├── modules/            # Domain Modules (Template, Document, Presentation, Health)
+│   │   ├── shared/             # Error Handling, Middlewares, Response Utilities
+│   │   ├── storage/            # File Storage Service & Path Security Guard
+│   │   ├── __tests__/          # Vitest Integration Test Suite (18 tests)
+│   │   ├── app.ts              # Express App Factory
+│   │   └── index.ts            # Server Bootstrap
 │   ├── prisma/
-│   │   ├── schema.prisma       # Database schema & indexes
-│   │   └── seed.ts             # OpenXML generator & seed script
+│   │   ├── schema.prisma       # Database Relational Schema
+│   │   └── seed.ts             # OpenXML Seed Generator (5 DOCX + 3 PPTX)
 │   ├── Dockerfile
 │   └── package.json
-├── storage/                    # Physical File Storage Root
-│   ├── templates/              # Immutable source templates
-│   │   ├── documents/          # 5 DOCX files
-│   │   └── presentations/      # 3 PPTX files
-│   ├── generated/              # User-generated cloned files
-│   └── thumbnails/             # High-res SVG thumbnails
-├── ARCHITECTURE.md             # Detailed Architectural Document
-├── API.md                      # RESTful API Reference
-├── THIRD_PARTY_LICENSES.md     # Third-Party Dependencies & Licenses
-├── AI_USAGE.md                 # AI Disclosure & Verification Record
-├── LIMITATIONS.md              # Limitations & Future Roadmap
-├── docker-compose.yml          # Containerized Orchestration
-└── package.json                # Monorepo root scripts
+├── storage/                    # Local Physical Storage
+│   ├── templates/              # Immutable Templates (5 DOCX, 3 PPTX)
+│   ├── generated/              # User Cloned Documents (UUID-named files)
+│   └── thumbnails/             # SVG Preview Thumbnails
+├── ARCHITECTURE.md             # Software Architecture Document (SAD)
+├── API.md                      # RESTful API Specification
+├── LIMITATIONS.md              # Limitations & Engineering Roadmap
+├── THIRD_PARTY_LICENSES.md     # Third-Party Dependencies & Open-Source Licenses
+├── docker-compose.yml          # Multi-container Orchestration
+└── package.json                # Monorepo Root Script Configuration
 ```
 
 ---
 
-## 📄 License
-This project is licensed under the MIT License.

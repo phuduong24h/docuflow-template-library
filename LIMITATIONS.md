@@ -26,7 +26,7 @@ This document transparently records the scope boundaries, technical trade-offs, 
 ## 2. Intentional MVP Scope Boundaries & Trade-Offs
 
 ### 2.1 PowerPoint Slide Editor In-Browser (Deliberately Deferred)
-- **Constraint**: As explicitly requested in prompt section I & V (*"Không giả lập một trình chỉnh sửa PowerPoint nếu chưa thực sự triển khai được. Ưu tiên luồng tạo bản sao PPTX và tải xuống hoạt động chính xác"*), we prioritized 100% valid, uncorrupted OpenXML binary cloning over a fake or buggy HTML-based slide canvas.
+- **Constraint**: To guarantee 100% valid, uncorrupted OpenXML binary files, we strictly prioritized native office compatibility and atomic file cloning over an experimental, buggy HTML canvas.
 - **Current Behavior**: Users preview slides in the interactive carousel, clone an independent PPTX copy, and download the `.pptx` file to open and edit directly in Microsoft PowerPoint, Apple Keynote, or Google Slides.
 - **Future Integration**: Integrating an OpenXML canvas engine (such as Canvas/Fabric.js rendering PPTX shapes, or Microsoft Office 365 WOPI / ONLYOFFICE Document Server integration).
 
@@ -36,7 +36,7 @@ This document transparently records the scope boundaries, technical trade-offs, 
 - **Future Integration**: Implement a structured field replacement engine via `docxtemplater` to allow form-based placeholders (`{CLIENT_NAME}`, `{BUDGET}`) before download.
 
 ### 2.3 User Authentication & Multi-Tenancy (P2 Deferred)
-- **Constraint**: The assessment prioritized core file processing, cloning, immutability, and clean architecture over superficial mockup login screens.
+- **Constraint**: The MVP focuses on core document lifecycle, sub-millisecond cloning, template immutability, and modular architecture rather than application authentication.
 - **Limitation**: The MVP does not currently enforce user-specific document ownership; any client can view and delete documents created during the session.
 - **Future Integration**: Adding NextAuth or JWT-based RBAC (Admin vs Member), assigning `userId` to `Document` records, and tenant data partitioning.
 

@@ -3,6 +3,7 @@ import { X, Copy, Loader2, Sparkles, FileText, Presentation } from 'lucide-react
 import { Template } from '../../types/template.types.ts';
 import { documentService } from '../../services/document.service.ts';
 import { presentationService } from '../../services/presentation.service.ts';
+import { useLanguage } from '../../context/LanguageContext.tsx';
 
 interface CreateDocumentModalProps {
   template: Template | null;
@@ -19,6 +20,7 @@ export const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
   onSuccess,
   onError,
 }) => {
+  const { t } = useLanguage();
   const [title, setTitle] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
   const [autoDownload, setAutoDownload] = useState<boolean>(true);
@@ -68,7 +70,7 @@ export const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
       }
       onClose();
     } catch (err) {
-      onError((err as Error).message || 'Failed to create document from template');
+      onError((err as Error).message || t.toasts.createErrorTitle);
     } finally {
       setIsSubmitting(false);
     }
@@ -89,9 +91,11 @@ export const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
             </div>
             <div>
               <h3 className="font-bold text-slate-900 text-base">
-                {isDoc ? 'Create Document Copy' : 'Create Presentation Copy'}
+                {isDoc ? t.createModal.createDocTitle : t.createModal.createPresTitle}
               </h3>
-              <p className="text-xs text-slate-500">From template: {template.name}</p>
+              <p className="text-xs text-slate-500">
+                {t.createModal.fromTemplate} <span className="font-semibold text-slate-700">{template.name}</span>
+              </p>
             </div>
           </div>
           <button
@@ -106,82 +110,78 @@ export const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
         <form onSubmit={handleCreate} className="p-6 space-y-4">
           <div>
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-              Document Title <span className="text-rose-500">*</span>
+              {t.createModal.titleLabel} *
             </label>
             <input
               type="text"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter document title..."
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:bg-white transition-all"
+              placeholder={t.createModal.titlePlaceholder}
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 font-medium text-slate-900"
             />
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-              Metadata / Purpose Notes (Optional)
+              {t.createModal.notesLabel}
             </label>
             <textarea
+              rows={3}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              rows={3}
-              placeholder="Add project notes, recipient details, or version memo..."
-              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:bg-white transition-all resize-none"
+              placeholder={t.createModal.notesPlaceholder}
+              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-slate-800"
             />
           </div>
 
-          {/* Auto Download Checkbox */}
-          <div className="flex items-center space-x-2.5 pt-1">
+          {/* Download Toggle Option */}
+          <div className="flex items-center space-x-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
             <input
               type="checkbox"
               id="autoDownload"
               checked={autoDownload}
               onChange={(e) => setAutoDownload(e.target.checked)}
-              className="w-4 h-4 text-brand-600 rounded border-slate-300 focus:ring-brand-500"
+              className="w-4 h-4 text-brand-600 rounded border-slate-300 focus:ring-brand-500 cursor-pointer"
             />
-            <label htmlFor="autoDownload" className="text-xs font-medium text-slate-600 cursor-pointer">
-              Automatically download {isDoc ? 'DOCX' : 'PPTX'} file upon creation
+            <label htmlFor="autoDownload" className="text-xs text-slate-700 font-medium cursor-pointer">
+              {t.createModal.autoDownloadLabel}
             </label>
           </div>
 
-          {/* Security & Immutability Notice */}
-          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex items-start space-x-2 text-xs text-slate-500">
-            <Sparkles className="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5" />
-            <p>
-              The original template remains completely untouched. An isolated physical file copy will be
-              instantiated in storage with unique ID tracking.
-            </p>
+          {/* Immutability Guarantee Note */}
+          <div className="flex items-start space-x-2.5 p-3 rounded-xl bg-brand-50/60 border border-brand-100 text-[11px] text-brand-900 leading-relaxed">
+            <Copy className="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <span className="font-bold">{t.createModal.immutabilityNoteTitle}: </span>
+              {t.createModal.immutabilityNoteDesc}
+            </div>
           </div>
 
-          {/* Footer Actions */}
-          <div className="pt-3 flex items-center justify-end space-x-3">
+          {/* Form Actions */}
+          <div className="pt-2 flex items-center justify-end space-x-2">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all"
+              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors"
             >
-              Cancel
+              {t.createModal.cancel}
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !title.trim()}
-              className={`inline-flex items-center space-x-2 px-5 py-2.5 text-xs font-semibold text-white rounded-xl shadow-md transition-all ${
-                isDoc
-                  ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/20'
-                  : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20'
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
+              className="inline-flex items-center space-x-1.5 px-5 py-2.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-xs font-semibold rounded-xl shadow-sm shadow-brand-500/20 transition-all"
             >
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Cloning file...</span>
+                  <span>{t.createModal.creating}</span>
                 </>
               ) : (
                 <>
-                  <Copy className="w-4 h-4" />
-                  <span>Create {isDoc ? 'Document' : 'Presentation'}</span>
+                  <Sparkles className="w-4 h-4" />
+                  <span>{isDoc ? t.createModal.createDocBtn : t.createModal.createPresBtn}</span>
                 </>
               )}
             </button>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext.tsx';
 
 interface CategoryFilterProps {
   categories: string[];
@@ -11,6 +12,8 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
   selectedCategory,
   onSelectCategory,
 }) => {
+  const { t, translateCategory } = useLanguage();
+
   return (
     <div className="flex items-center space-x-2 overflow-x-auto py-2 scrollbar-none">
       <button
@@ -21,7 +24,7 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
             : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'
         }`}
       >
-        All Categories
+        {t.common.allCategories}
       </button>
 
       {categories.map((cat) => {
@@ -36,7 +39,7 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
                 : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'
             }`}
           >
-            {cat}
+            {translateCategory(cat)}
           </button>
         );
       })}

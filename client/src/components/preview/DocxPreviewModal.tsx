@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, FileText, Plus, Check } from 'lucide-react';
 import { Template } from '../../types/template.types.ts';
+import { useLanguage } from '../../context/LanguageContext.tsx';
 
 interface DocxPreviewModalProps {
   template: Template | null;
@@ -15,6 +16,7 @@ export const DocxPreviewModal: React.FC<DocxPreviewModalProps> = ({
   onClose,
   onUseTemplate,
 }) => {
+  const { t, translateCategory } = useLanguage();
   if (!isOpen || !template) return null;
 
   const previewHtml = (template.previewData as { html?: string })?.html || '';
@@ -33,11 +35,11 @@ export const DocxPreviewModal: React.FC<DocxPreviewModalProps> = ({
               <div className="flex items-center space-x-2">
                 <h3 className="font-bold text-slate-900 text-base">{template.name}</h3>
                 <span className="text-[10px] font-semibold bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">
-                  DOCX Preview
+                  {t.docxModal.badge}
                 </span>
               </div>
               <p className="text-xs text-slate-500">
-                Category: <span className="font-semibold text-slate-700">{template.category}</span> • Size: {sizeKb} KB
+                {t.docxModal.category}: <span className="font-semibold text-slate-700">{translateCategory(template.category)}</span> • {t.docxModal.size}: {sizeKb} KB
               </p>
             </div>
           </div>
@@ -48,7 +50,7 @@ export const DocxPreviewModal: React.FC<DocxPreviewModalProps> = ({
               className="inline-flex items-center space-x-1.5 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-xl shadow-sm transition-all"
             >
               <Plus className="w-4 h-4" />
-              <span>Use This Template</span>
+              <span>{t.docxModal.useThisTemplate}</span>
             </button>
             <button
               onClick={onClose}
@@ -70,7 +72,7 @@ export const DocxPreviewModal: React.FC<DocxPreviewModalProps> = ({
             ) : (
               <div className="text-center py-16 text-slate-400">
                 <FileText className="w-12 h-12 mx-auto mb-3 opacity-40" />
-                <p>Generating document outline...</p>
+                <p>{t.docxModal.generatingOutline}</p>
               </div>
             )}
           </div>
@@ -80,13 +82,13 @@ export const DocxPreviewModal: React.FC<DocxPreviewModalProps> = ({
         <div className="px-6 py-3 border-t border-slate-200 bg-white flex items-center justify-between text-xs text-slate-500">
           <span className="flex items-center space-x-1 text-emerald-600 font-medium">
             <Check className="w-4 h-4" />
-            <span>Preserved OpenXML DOCX standard. Compatible with Microsoft Word & LibreOffice.</span>
+            <span>{t.docxModal.footerGuarantee}</span>
           </span>
           <button
             onClick={onClose}
             className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium"
           >
-            Close
+            {t.docxModal.close}
           </button>
         </div>
       </div>

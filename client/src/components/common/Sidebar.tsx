@@ -1,5 +1,6 @@
 import React from 'react';
 import { FileText, Presentation, FolderGit2, Sparkles } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext.tsx';
 
 export type ActiveView = 'DOCUMENTS' | 'PRESENTATIONS' | 'MY_FILES';
 
@@ -18,30 +19,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
   presentationCount = 3,
   myFilesCount = 0,
 }) => {
+  const { t } = useLanguage();
+
   const navItems = [
     {
       id: 'DOCUMENTS' as ActiveView,
-      label: 'Document Templates',
+      label: t.sidebar.docxTitle,
       icon: FileText,
-      badge: `${documentCount} DOCX`,
+      badge: t.sidebar.docxBadge.replace('{count}', String(documentCount)),
       badgeColor: 'bg-blue-100 text-blue-700',
-      description: 'Word proposals, contracts, reports',
+      description: t.sidebar.docxDesc,
     },
     {
       id: 'PRESENTATIONS' as ActiveView,
-      label: 'Presentation Templates',
+      label: t.sidebar.pptxTitle,
       icon: Presentation,
-      badge: `${presentationCount} PPTX`,
+      badge: t.sidebar.pptxBadge.replace('{count}', String(presentationCount)),
       badgeColor: 'bg-emerald-100 text-emerald-700',
-      description: 'PowerPoint pitch decks & slides',
+      description: t.sidebar.pptxDesc,
     },
     {
       id: 'MY_FILES' as ActiveView,
-      label: 'My Generated Documents',
+      label: t.sidebar.myFilesTitle,
       icon: FolderGit2,
       badge: `${myFilesCount}`,
       badgeColor: 'bg-purple-100 text-purple-700',
-      description: 'Cloned files ready for download',
+      description: t.sidebar.myFilesDesc,
     },
   ];
 
@@ -50,7 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="space-y-6">
         <div>
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3">
-            Product Catalogs
+            {t.sidebar.catalogs}
           </span>
           <nav className="mt-2 space-y-1.5">
             {navItems.map((item) => {
@@ -62,7 +65,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onClick={() => onSelectView(item.id)}
                   className={`w-full flex items-start space-x-3 px-3 py-2.5 rounded-xl text-left transition-all ${
                     isActive
-                      ? 'bg-brand-50 text-brand-900 font-semibold shadow-sm border border-brand-200/70'
+                      ? 'bg-brand-50 text-brand-900 font-semibold shadow-xs border border-brand-200/70'
                       : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 font-medium'
                   }`}
                 >
@@ -90,18 +93,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 p-3.5 text-white shadow-md">
           <div className="flex items-center space-x-1.5 text-xs font-semibold text-brand-400">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Immutable Templates</span>
+            <span>{t.sidebar.immutableBannerTitle}</span>
           </div>
           <p className="mt-1 text-xs text-slate-300 leading-relaxed">
-            All template originals are physically preserved. Every clone generates an isolated OpenXML copy.
+            {t.sidebar.immutableBannerDesc}
           </p>
         </div>
       </div>
 
       {/* Footer Info */}
       <div className="pt-4 border-t border-slate-100 text-xs text-slate-400 px-2">
-        <p>Clean Architecture Monolith</p>
-        <p className="text-[10px] text-slate-400 mt-0.5">PostgreSQL • Express • React</p>
+        <p className="font-medium text-slate-600">{t.sidebar.footerTitle}</p>
+        <p className="text-[10px] text-slate-400 mt-0.5">{t.sidebar.footerSubtitle}</p>
       </div>
     </aside>
   );

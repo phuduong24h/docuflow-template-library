@@ -13,6 +13,16 @@ async function ensureDir(dirPath: string) {
   await fs.mkdir(dirPath, { recursive: true });
 }
 
+// Helper to escape XML special characters
+function escapeXml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
 // Helper to write SVG thumbnail
 async function writeSvgThumbnail(filename: string, title: string, category: string, type: 'DOCUMENT' | 'PRESENTATION', accentColor: string) {
   const isDoc = type === 'DOCUMENT';
@@ -45,10 +55,10 @@ async function writeSvgThumbnail(filename: string, title: string, category: stri
 
     <!-- Badge -->
     <rect x="220" y="52" width="100" height="22" rx="11" fill="#f1f5f9"/>
-    <text x="270" y="67" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">${category.toUpperCase()}</text>
+    <text x="270" y="67" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">${escapeXml(category.toUpperCase())}</text>
 
     <!-- Title -->
-    <text x="20" y="112" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="bold" fill="#0f172a">${title.length > 28 ? title.slice(0, 25) + '...' : title}</text>
+    <text x="20" y="112" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="bold" fill="#0f172a">${escapeXml(title.length > 28 ? title.slice(0, 25) + '...' : title)}</text>
 
     <!-- Content mock lines -->
     <rect x="20" y="130" width="280" height="6" rx="3" fill="#e2e8f0"/>
